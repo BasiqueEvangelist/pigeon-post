@@ -1,0 +1,16 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.bird_stand.idle": {
+			"loop": true,
+			"animation_length": 4.5,
+			"bones": {
+				"bag": {
+					"rotation": {
+						"vector": ["math.cos(query.anim_time*80)*5", 0, 0]
+					}
+				}
+			}
+		}
+	}
+}
