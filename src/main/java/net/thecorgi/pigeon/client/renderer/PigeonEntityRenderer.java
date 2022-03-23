@@ -4,19 +4,15 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.ParrotEntityRenderer;
-import net.minecraft.client.render.entity.model.ParrotEntityModel;
 import net.minecraft.client.util.math.MatrixStack;
-import net.thecorgi.pigeon.client.model.PigeonModel;
-import net.thecorgi.pigeon.entity.PigeonEntity;
+import net.thecorgi.pigeon.client.model.PigeonEntityModel;
+import net.thecorgi.pigeon.common.entity.PigeonEntity;
 import software.bernie.geckolib3.geo.render.built.GeoModel;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
 import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 
 public class PigeonEntityRenderer extends GeoEntityRenderer<PigeonEntity> {
     public PigeonEntityRenderer(EntityRendererFactory.Context renderManager) {
-        super(renderManager, new PigeonModel());
-        this.addLayer(new PigeonShoulderFeatureRenderer(this));
+        super(renderManager, new PigeonEntityModel());
     }
 
     @Override
@@ -24,10 +20,11 @@ public class PigeonEntityRenderer extends GeoEntityRenderer<PigeonEntity> {
                        MatrixStack matrixStackIn, VertexConsumerProvider renderTypeBuffer, VertexConsumer vertexBuilder,
                        int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
         if (animatable.isTamed()) {
-            model.getBone("left_chest").get().setHidden(false);
+            model.getBone("bag").get().setHidden(false);
         } else {
-            model.getBone("left_chest").get().setHidden(true);
+            model.getBone("bag").get().setHidden(true);
         }
+
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder,
                 packedLightIn, packedOverlayIn, red, green, blue, alpha);
     }

@@ -3,7 +3,7 @@
   "id": "pigeon",
   "version": "1.0.0",
 
-  "name": "Example Mod",
+  "name": "Pigeon Post",
   "description": "This is an example description! Tell everyone what your mod is about!",
   "authors": [
     "Me!"
@@ -21,11 +21,14 @@
     "main": [
       "net.thecorgi.pigeon.PigeonPost"
     ],
+    "cardinal-components-entity": [
+    ],
     "client": [
       "net.thecorgi.pigeon.client.PigeonPostClient"
     ]
   },
   "mixins": [
+    "pigeon.mixins.json"
   ],
 
   "depends": {
@@ -36,5 +39,10 @@
   },
   "suggests": {
     "another-mod": "*"
+  },
+
+  "custom": {
+    "cardinal-components": [
+    ]
   }
 }

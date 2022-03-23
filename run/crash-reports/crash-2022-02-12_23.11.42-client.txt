@@ -44,7 +44,7 @@ Stacktrace:
 
 -- Entity being rendered --
 Details:
-	Entity Type: pigeon:pigeon (net.thecorgi.pigeon.entity.PigeonEntity)
+	Entity Type: pigeon:pigeon (net.thecorgi.pigeon.common.entity.PigeonEntity)
 	Entity ID: 3
 	Entity Name: entity.pigeon.pigeon
 	Entity's Exact location: 9.18, -60.00, 6.06

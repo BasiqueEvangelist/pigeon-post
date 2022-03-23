@@ -2,14 +2,13 @@ package net.thecorgi.pigeon.client.model;
 
 import net.minecraft.util.Identifier;
 import net.thecorgi.pigeon.PigeonPost;
-import net.thecorgi.pigeon.block.BirdStandBlockEntity;
-import net.thecorgi.pigeon.entity.PigeonEntity;
+import net.thecorgi.pigeon.common.entity.PigeonEntity;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.processor.IBone;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 import software.bernie.geckolib3.model.provider.data.EntityModelData;
 
-public class PigeonModel extends AnimatedGeoModel<PigeonEntity> {
+public class PigeonEntityModel extends AnimatedGeoModel<PigeonEntity> {
     @Override
     public Identifier getModelLocation(PigeonEntity object) {
         return PigeonPost.id("geo/pigeon.geo.json");
@@ -17,7 +16,7 @@ public class PigeonModel extends AnimatedGeoModel<PigeonEntity> {
 
     @Override
     public Identifier getTextureLocation(PigeonEntity object) {
-        return PigeonPost.id("textures/entity/pigeon.png");
+        return PigeonPost.id("textures/entity/pigeon_" + object.getVariant() + ".png");
     }
 
     @Override
