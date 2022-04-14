@@ -24,7 +24,7 @@ public class EnvelopeScreen extends HandledScreen<EnvelopeScreenHandler> {
         super(handler, inventory, title);
 //        this.passEvents = false;
         this.rows = 6;
-        this.backgroundHeight = 133;
+        this.backgroundHeight = 134;
     }
 
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {

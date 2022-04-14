@@ -6,14 +6,17 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.thecorgi.pigeon.common.block.BirdHouseBlockEntity;
 import net.thecorgi.pigeon.common.inventory.EnvelopeInventory;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +38,7 @@ public class EnvelopeItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         user.setCurrentHand(hand);
 
-        if(!world.isClient) {
+        if(!world.isClient && !user.isSneaking()) {
             ContainerProviderRegistry.INSTANCE.openContainer(id("envelope"), user, buf -> {
                 ItemStack stack = user.getStackInHand(hand);
                 buf.writeItemStack(stack);
@@ -47,16 +50,30 @@ public class EnvelopeItem extends Item {
         return super.use(world, user, hand);
     }
 
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        BlockPos pos = context.getBlockPos();
+        World world = context.getWorld();
+        if (world.getBlockEntity(pos) instanceof BirdHouseBlockEntity) {
+            if (context.getPlayer() != null && context.getPlayer().isSneaking()) {
+                 ItemStack stack = context.getStack();
+                 if (stack.getItem() instanceof EnvelopeItem) {
+                     stack.getOrCreateNbt().putLong("Address", pos.asLong());
+                 }
+            }
+        }
+        return ActionResult.PASS;
+    }
+
     public static EnvelopeInventory getInventory(ItemStack stack, Hand hand, PlayerEntity player) {
         if(!stack.hasNbt()) {
             stack.setNbt(new NbtCompound());
         }
 
-        if(!stack.getNbt().contains("envelope")) {
-            stack.getNbt().put("envelope", new NbtCompound());
+        if(!stack.getOrCreateNbt().contains("Envelope")) {
+            stack.getNbt().put("Envelope", new NbtCompound());
         }
 
-        return new EnvelopeInventory(stack.getNbt().getCompound("envelope"), hand, player);
+        return new EnvelopeInventory(stack.getOrCreateNbt().getCompound("Envelope"), hand, player);
     }
 
 

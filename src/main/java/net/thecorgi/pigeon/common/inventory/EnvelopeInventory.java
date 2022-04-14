@@ -90,7 +90,7 @@ public class EnvelopeInventory implements Inventory, EnvelopeInventoryInterface 
     }
 
     public void fromTag(NbtCompound tag) {
-        this.inventory_width = tag.contains("inventory_width") ? tag.getInt("inventory_width") : 5;
+        this.inventory_width = tag.contains("inventory_width") ? tag.getInt("inventory_width") : 4 ;
         this.inventory_height = tag.contains("inventory_height") ? tag.getInt("inventory_height") : 1;
 
         this.items = DefaultedList.ofSize(inventory_width * inventory_height, ItemStack.EMPTY);
@@ -120,7 +120,18 @@ public class EnvelopeInventory implements Inventory, EnvelopeInventoryInterface 
             player.getStackInHand(hand).setNbt(new NbtCompound());
         }
 
-        Objects.requireNonNull(player.getStackInHand(hand).getNbt()).put("envelope", toTag());
+        Objects.requireNonNull(player.getStackInHand(hand).getNbt()).put("Envelope", toTag());
         player.playSound(SoundEvents.BLOCK_WOOL_PLACE, SoundCategory.PLAYERS, 1f, 1f);
+    }
+
+    protected int getSlotCount() {
+        return this.inventory_height * this.inventory_width;
+    }
+
+    public void offerOrDropAll(PlayerEntity player) {
+        for (int i = 0; i < this.getSlotCount(); i++) {
+            player.getInventory().offerOrDrop(this.getStack(i));
+        }
+        this.clear();
     }
 }

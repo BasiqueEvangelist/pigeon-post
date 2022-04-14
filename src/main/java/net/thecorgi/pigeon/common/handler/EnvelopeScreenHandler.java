@@ -16,6 +16,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Hand;
 import net.thecorgi.pigeon.PigeonPost;
+import net.thecorgi.pigeon.common.inventory.EnvelopeInventory;
 import net.thecorgi.pigeon.common.item.EnvelopeItem;
 
 import java.util.Set;
@@ -86,7 +87,7 @@ public class EnvelopeScreenHandler extends ScreenHandler {
 
         int n;
         int m;
-        for(n = 0; n < 5; ++n) {
+        for(n = 0; n < inventoryWidth * inventoryHeight; ++n) {
             if (n != 2) {
                 this.addSlot(new Slot(inventory, n, 44 + n * 18, 20));
             }
@@ -143,97 +144,3 @@ public class EnvelopeScreenHandler extends ScreenHandler {
         return newStack;
     }
 }
-
-//    public static final int SLOT_COUNT = 5;
-//    private final Inventory inventory;
-//    private final PlayerInventory playerInventory;
-//    public final int inventoryWidth;
-//    public final int inventoryHeight;
-//    public final String customTitle;
-//    public final String customTitle;
-
-    //    public EnvelopeScreenHandler(int syncId, PlayerInventory playerInventory) {
-    //        this(syncId, playerInventory, new SimpleInventory(5));
-    //    }
-
-//    public EnvelopeScreenHandler(final int syncId, final PlayerInventory playerInventory, final Inventory inventory, final int inventoryWidth, final int inventoryHeight, final Hand hand, String customTitle) {
-//        super(null, syncId);
-//        this.inventory = inventory;
-//        this.playerInventory = playerInventory;
-//        this.inventoryWidth = inventoryWidth;
-//        this.inventoryHeight = inventoryHeight;
-//        this.customTitle = customTitle;
-//
-//        checkSize(inventory, inventoryWidth * inventoryHeight);
-//        inventory.onOpen(playerInventory.player);
-//        setupSlots(false);
-//    }
-//    public EnvelopeScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
-//        super(null, syncId);
-//        this.inventory = inventory;
-//        this.playerInventory = playerInventory;
-//        this.inventoryWidth = inventoryWidth;
-//        this.inventoryHeight = inventoryHeight;
-//        this.customTitle = customTitle;
-//
-//        checkSize(inventory, inventoryWidth * inventoryHeight);
-//        inventory.onOpen(playerInventory.player);
-//        setupSlots(false);
-////        this.customTitle = customTitle;
-//        checkSize(inventory, 5);
-//    }
-
-//    public void setupSlots(final boolean includeChestInventory) {
-//        inventory.onOpen(playerInventory.player);
-//
-//        int j;
-//        for(j = 0; j < SLOT_COUNT; ++j) {
-//            if (j != 2) {
-//                this.addSlot(new Slot(inventory, j, 44 + j * 18, 20));
-//            }
-//        }
-//
-//        for(j = 0; j < 3; ++j) {
-//            for(int k = 0; k < 9; ++k) {
-//                this.addSlot(new Slot(playerInventory, k + j * 9 + 9, 8 + k * 18, j * 18 + 51));
-//            }
-//        }
-//
-//        for(j = 0; j < 9; ++j) {
-//            this.addSlot(new Slot(playerInventory, j, 8 + j * 18, 109));
-//        }
-//    }
-//
-//    public boolean canUse(PlayerEntity player) {
-//        return this.inventory.canPlayerUse(player);
-//    }
-//
-//    public ItemStack transferSlot(PlayerEntity player, int index) {
-//        ItemStack itemStack = ItemStack.EMPTY;
-//        Slot slot = this.slots.get(index);
-//        if (slot != null && slot.hasStack()) {
-//            ItemStack itemStack2 = slot.getStack();
-//            itemStack = itemStack2.copy();
-//            if (index < this.inventory.size()) {
-//                if (!this.insertItem(itemStack2, this.inventory.size(), this.slots.size(), true)) {
-//                    return ItemStack.EMPTY;
-//                }
-//            } else if (!this.insertItem(itemStack2, 0, this.inventory.size(), false)) {
-//                return ItemStack.EMPTY;
-//            }
-//
-//            if (itemStack2.isEmpty()) {
-//                slot.setStack(ItemStack.EMPTY);
-//            } else {
-//                slot.markDirty();
-//            }
-//        }
-//
-//        return itemStack;
-//    }
-//
-////    public void close(PlayerEntity player) {
-////        super.close(player);
-////        this.inventory.onClose(player);
-////    }
-//}
