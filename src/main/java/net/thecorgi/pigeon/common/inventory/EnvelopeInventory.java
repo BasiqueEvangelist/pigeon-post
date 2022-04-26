@@ -90,7 +90,7 @@ public class EnvelopeInventory implements Inventory, EnvelopeInventoryInterface 
     }
 
     public void fromTag(NbtCompound tag) {
-        this.inventory_width = tag.contains("inventory_width") ? tag.getInt("inventory_width") : 4 ;
+        this.inventory_width = tag.contains("inventory_width") ? tag.getInt("inventory_width") : 4;
         this.inventory_height = tag.contains("inventory_height") ? tag.getInt("inventory_height") : 1;
 
         this.items = DefaultedList.ofSize(inventory_width * inventory_height, ItemStack.EMPTY);

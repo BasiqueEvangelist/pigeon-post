@@ -38,41 +38,16 @@ public class PigeonPost implements ModInitializer {
         return new Identifier(ModID, path);
     }
 
-//    public static final Block NEST = new NestBlock(FabricBlockSettings.of(Material.WOOD).strength(0.3f).breakByHand(true));
-//    public static BlockEntityType<NestBlockEntity> NEST_BLOCK_ENTITY_TYPE;
-
     public static final ItemGroup GENERAL = FabricItemGroupBuilder.create(
                     id("general"))
             .icon(() -> new ItemStack(ENVELOPE))
             .build();
 
-//    public static final ScreenHandlerType<EnvelopeScreenHandler> ENVELOPE_SCREEN_HANDLER;
-//
-//    static {
-//        ENVELOPE_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(id("envelope"), EnvelopeScreenHandler::new);
-//    }
-
-
-
     @Override
     public void onInitialize() {
-        GeckoLib.initialize();
         ItemRegistry.init();
         BlockRegistry.init();
         EntityRegistry.init();
         SpawnRegistry.init();
-
-        ContainerProviderRegistry.INSTANCE.registerFactory(id("envelope"), ((syncId, identifier, player, buf) -> {
-            final ItemStack stack = buf.readItemStack();
-            final Hand hand = buf.readInt() == 0 ? Hand.MAIN_HAND : Hand.OFF_HAND;
-            final EnvelopeInventoryInterface inventory = EnvelopeItem.getInventory(stack, hand, player);
-            final String customTitle = buf.readString();
-
-            return new EnvelopeScreenHandler(syncId, player.getInventory(), inventory.getInventory(), inventory.getInventoryWidth(), inventory.getInventoryHeight(), hand, customTitle);
-        }));
-
-
-//        Registry.register(Registry.SCREEN_HANDLER, id("envelope"), ENVELOPE_SCREEN_HANDLER);
-
     }
 }

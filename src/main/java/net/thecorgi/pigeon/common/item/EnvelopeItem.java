@@ -1,14 +1,12 @@
 package net.thecorgi.pigeon.common.item;
 
 import net.fabricmc.fabric.api.container.ContainerProviderRegistry;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
@@ -16,7 +14,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.thecorgi.pigeon.common.block.BirdHouseBlockEntity;
+import net.thecorgi.pigeon.common.block.BirdhouseBlockEntity;
 import net.thecorgi.pigeon.common.inventory.EnvelopeInventory;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +51,7 @@ public class EnvelopeItem extends Item {
     public ActionResult useOnBlock(ItemUsageContext context) {
         BlockPos pos = context.getBlockPos();
         World world = context.getWorld();
-        if (world.getBlockEntity(pos) instanceof BirdHouseBlockEntity) {
+        if (world.getBlockEntity(pos) instanceof BirdhouseBlockEntity) {
             if (context.getPlayer() != null && context.getPlayer().isSneaking()) {
                  ItemStack stack = context.getStack();
                  if (stack.getItem() instanceof EnvelopeItem) {
@@ -76,9 +74,6 @@ public class EnvelopeItem extends Item {
         return new EnvelopeInventory(stack.getOrCreateNbt().getCompound("Envelope"), hand, player);
     }
 
-
-
-
     private boolean containsAddress(ItemStack stack) {
         if (stack.getNbt() == null) {
             return false;
@@ -98,6 +93,7 @@ public class EnvelopeItem extends Item {
             int y = BlockPos.unpackLongY(pos);
             int z = BlockPos.unpackLongZ(pos);
             tooltip.add(new TranslatableText("item.pigeon.envelope.contains_address", Integer.toString(x), Integer.toString(y), Integer.toString(z)).formatted(Formatting.GRAY));
+            tooltip.add(new TranslatableText("item.pigeon.envelope.give_to_pigeon").formatted(Formatting.GRAY));
         } else {
             tooltip.add(new TranslatableText("item.pigeon.envelope.empty").formatted(Formatting.GRAY));
         }

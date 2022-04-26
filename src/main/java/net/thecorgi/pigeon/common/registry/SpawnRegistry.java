@@ -7,7 +7,7 @@ import net.minecraft.world.biome.Biome;
 
 public class SpawnRegistry {
     public static void init() {
-        BiomeModifications.addSpawn(BiomeSelectors.foundInOverworld(), SpawnGroup.CREATURE,
+        BiomeModifications.addSpawn(BiomeSelectors.categories(Biome.Category.PLAINS, Biome.Category.BEACH, Biome.Category.FOREST, Biome.Category.MOUNTAIN), SpawnGroup.CREATURE,
                 EntityRegistry.PIGEON, 1, 2, 7);
     }
 }

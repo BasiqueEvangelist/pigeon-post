@@ -9,19 +9,19 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.util.registry.Registry;
 import net.thecorgi.pigeon.PigeonPost;
-import net.thecorgi.pigeon.common.block.BirdHouseBlock;
-import net.thecorgi.pigeon.common.block.BirdHouseBlockEntity;
+import net.thecorgi.pigeon.common.block.BirdhouseBlock;
+import net.thecorgi.pigeon.common.block.BirdhouseBlockEntity;
 
 import static net.thecorgi.pigeon.PigeonPost.id;
 
 public class BlockRegistry {
-    public static Block BIRD_HOUSE = new BirdHouseBlock(FabricBlockSettings.of(Material.BAMBOO).nonOpaque().breakByHand(true));
-    public static BlockEntityType<BirdHouseBlockEntity> BIRD_HOUSE_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(BirdHouseBlockEntity::new, BIRD_HOUSE).build(null);
+    public static Block BIRDHOUSE = new BirdhouseBlock(FabricBlockSettings.of(Material.BAMBOO).nonOpaque().strength(1.5F));
+    public static BlockEntityType<BirdhouseBlockEntity> BIRDHOUSE_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(BirdhouseBlockEntity::new, BIRDHOUSE).build(null);
 
 
     public static void init() {
-        register(BIRD_HOUSE, "bird_house", true);
-        register(BIRD_HOUSE_BLOCK_ENTITY,"bird_house_block_entity");
+        register(BIRDHOUSE, "birdhouse", true);
+        register(BIRDHOUSE_BLOCK_ENTITY,"birdhouse_block_entity");
     }
 
     private static void register(Block block, String path, boolean item) {

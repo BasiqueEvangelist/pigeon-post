@@ -16,7 +16,7 @@ public class PigeonEntityModel extends AnimatedGeoModel<PigeonEntity> {
 
     @Override
     public Identifier getTextureLocation(PigeonEntity object) {
-        return PigeonPost.id("textures/entity/pigeon_" + object.getVariant() + ".png");
+        return PigeonPost.id("textures/entity/pigeon/pigeon_" + object.getVariant() + ".png");
     }
 
     @Override

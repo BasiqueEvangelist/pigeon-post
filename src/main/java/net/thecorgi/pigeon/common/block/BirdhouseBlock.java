@@ -1,14 +1,9 @@
 package net.thecorgi.pigeon.common.block;
 
 import net.minecraft.block.*;
-import net.minecraft.block.entity.BeehiveBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
@@ -18,22 +13,16 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.thecorgi.pigeon.common.entity.PigeonEntity;
-import net.thecorgi.pigeon.common.inventory.EnvelopeInventory;
-import net.thecorgi.pigeon.common.item.EnvelopeItem;
-import net.thecorgi.pigeon.common.registry.ItemRegistry;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
-public class BirdHouseBlock extends HorizontalFacingBlock implements BlockEntityProvider {
+public class BirdhouseBlock extends HorizontalFacingBlock implements BlockEntityProvider {
     public static final BooleanProperty POWERED;
 
     static {
         POWERED = Properties.POWERED;
     }
 
-    public BirdHouseBlock(Settings settings) {
+    public BirdhouseBlock(Settings settings) {
         super(settings);
         setDefaultState(this.stateManager.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH).with(POWERED, false));
     }
@@ -52,7 +41,7 @@ public class BirdHouseBlock extends HorizontalFacingBlock implements BlockEntity
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new BirdHouseBlockEntity(pos, state);
+        return new BirdhouseBlockEntity(pos, state);
     }
 
     @Override
@@ -60,7 +49,7 @@ public class BirdHouseBlock extends HorizontalFacingBlock implements BlockEntity
         if (!world.isClient)
             if (player.getActiveHand().equals(hand) && !player.isSneaking()) {
                 BlockEntity blockEntity = world.getBlockEntity(pos);
-                if (blockEntity instanceof BirdHouseBlockEntity birdHouse) {
+                if (blockEntity instanceof BirdhouseBlockEntity birdHouse) {
                      if (birdHouse.hasPigeon()) {
                         birdHouse.tryReleasePigeon(state, player);
                     }
@@ -69,6 +58,18 @@ public class BirdHouseBlock extends HorizontalFacingBlock implements BlockEntity
             }
 
         return ActionResult.PASS;
+    }
+
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        if (!world.isClient) {
+            BlockEntity blockEntity = world.getBlockEntity(pos);
+            if (blockEntity instanceof BirdhouseBlockEntity birdHouse) {
+                if (birdHouse.hasPigeon()) {
+                    birdHouse.tryReleasePigeon(state, player);
+                }
+            }
+        }
+        super.onBreak(world, pos, state, player);
     }
 
     @Override
@@ -84,7 +85,7 @@ public class BirdHouseBlock extends HorizontalFacingBlock implements BlockEntity
         boolean bl = !world.isReceivingRedstonePower(pos);
         if (bl != (Boolean)state.get(POWERED)) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof BirdHouseBlockEntity) {
+            if (blockEntity instanceof BirdhouseBlockEntity) {
                 world.setBlockState(pos, (BlockState) state.with(POWERED, bl), 4);
             }
         }
@@ -95,7 +96,13 @@ public class BirdHouseBlock extends HorizontalFacingBlock implements BlockEntity
     }
 
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
+        if(world.getBlockEntity(pos) instanceof BirdhouseBlockEntity birdHouse) {
+            if (birdHouse.hasPigeon()) {
+                return 6;
+            }
+        }
+
+        return 0;
     }
 
 }

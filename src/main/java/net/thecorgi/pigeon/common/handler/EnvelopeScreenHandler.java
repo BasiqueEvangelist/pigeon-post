@@ -27,15 +27,11 @@ public class EnvelopeScreenHandler extends ScreenHandler {
     public final int inventoryWidth;
     public final int inventoryHeight;
     public final String customTitle;
-    public static final Set<Item> SHULKER_BOXES;
-
-    static {
-        SHULKER_BOXES = Sets.newHashSet(Items.SHULKER_BOX, Items.BLACK_SHULKER_BOX, Items.BLUE_SHULKER_BOX,
-                Items.BROWN_SHULKER_BOX, Items.CYAN_SHULKER_BOX, Items.GRAY_SHULKER_BOX, Items.GREEN_SHULKER_BOX,
-                Items.LIGHT_BLUE_SHULKER_BOX, Items.LIGHT_GRAY_SHULKER_BOX, Items.LIME_SHULKER_BOX,
-                Items.MAGENTA_SHULKER_BOX, Items.ORANGE_SHULKER_BOX, Items.PINK_SHULKER_BOX, Items.RED_SHULKER_BOX,
-                Items.WHITE_SHULKER_BOX, Items.YELLOW_SHULKER_BOX, Items.PURPLE_SHULKER_BOX);
-    }
+    public static final Set<Item> SHULKER_BOXES = Sets.newHashSet(Items.SHULKER_BOX, Items.BLACK_SHULKER_BOX, Items.BLUE_SHULKER_BOX,
+            Items.BROWN_SHULKER_BOX, Items.CYAN_SHULKER_BOX, Items.GRAY_SHULKER_BOX, Items.GREEN_SHULKER_BOX,
+            Items.LIGHT_BLUE_SHULKER_BOX, Items.LIGHT_GRAY_SHULKER_BOX, Items.LIME_SHULKER_BOX,
+            Items.MAGENTA_SHULKER_BOX, Items.ORANGE_SHULKER_BOX, Items.PINK_SHULKER_BOX, Items.RED_SHULKER_BOX,
+            Items.WHITE_SHULKER_BOX, Items.YELLOW_SHULKER_BOX, Items.PURPLE_SHULKER_BOX);
 
     public EnvelopeScreenHandler(final int syncId, final PlayerInventory playerInventory, final Inventory inventory, final int inventoryWidth, final int inventoryHeight, final Hand hand, String customTitle) {
         super(null, syncId);
@@ -87,11 +83,11 @@ public class EnvelopeScreenHandler extends ScreenHandler {
 
         int n;
         int m;
-        for(n = 0; n < inventoryWidth * inventoryHeight; ++n) {
-            if (n != 2) {
-                this.addSlot(new Slot(inventory, n, 44 + n * 18, 20));
-            }
-        }
+
+        this.addSlot(new Slot(inventory, 0, 44, 20));
+        this.addSlot(new Slot(inventory, 1, 44 + 18, 20));
+        this.addSlot(new Slot(inventory, 2, 44 + 3 * 18, 20));
+        this.addSlot(new Slot(inventory, 3, 44 + 4 * 18, 20));
 
         for(n = 0; n < 3; ++n) {
             for(m = 0; m < 9; ++m) {

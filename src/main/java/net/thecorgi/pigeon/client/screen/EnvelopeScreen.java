@@ -22,9 +22,9 @@ public class EnvelopeScreen extends HandledScreen<EnvelopeScreenHandler> {
 
     public EnvelopeScreen(EnvelopeScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
-//        this.passEvents = false;
+        this.passEvents = false;
         this.rows = 6;
-        this.backgroundHeight = 134;
+        this.backgroundHeight = 131;
     }
 
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
@@ -51,7 +51,6 @@ public class EnvelopeScreen extends HandledScreen<EnvelopeScreenHandler> {
     @Override
     protected void init() {
         super.init();
-        // Center the title
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
     }
 }

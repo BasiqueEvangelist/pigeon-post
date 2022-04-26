@@ -10,7 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
-import net.thecorgi.pigeon.client.renderer.BirdHouseBlockRenderer;
+import net.thecorgi.pigeon.client.renderer.BirdhouseBlockRenderer;
 import net.thecorgi.pigeon.client.renderer.PigeonEntityRenderer;
 import net.thecorgi.pigeon.client.screen.EnvelopeScreen;
 import net.thecorgi.pigeon.common.handler.EnvelopeScreenHandler;
@@ -24,7 +24,7 @@ public class PigeonPostClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         EntityRendererRegistry.register(EntityRegistry.PIGEON, PigeonEntityRenderer::new);
-        BlockEntityRendererRegistry.register(BlockRegistry.BIRD_HOUSE_BLOCK_ENTITY, (BlockEntityRendererFactory.Context rendererDispatcherIn) -> new BirdHouseBlockRenderer());
+        BlockEntityRendererRegistry.register(BlockRegistry.BIRDHOUSE_BLOCK_ENTITY, (BlockEntityRendererFactory.Context rendererDispatcherIn) -> new BirdhouseBlockRenderer());
 
         String translationKey = Util.createTranslationKey("container", id("envelope"));
 

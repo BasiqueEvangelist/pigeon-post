@@ -1,22 +1,17 @@
 package net.thecorgi.pigeon.common.block;
 
-import net.minecraft.block.BeehiveBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BeehiveBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.passive.BeeEntity;
-import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.network.Packet;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.EntityTypeTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -35,11 +30,10 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-public class BirdHouseBlockEntity extends BlockEntity implements IAnimatable {
+public class BirdhouseBlockEntity extends BlockEntity implements IAnimatable {
     private AnimationFactory factory = new AnimationFactory(this);
     private Pigeon pigeon;
     public static final String ENVELOPE_KEY = "Envelope";
@@ -47,28 +41,24 @@ public class BirdHouseBlockEntity extends BlockEntity implements IAnimatable {
     private static final List<String> IRRELEVANT_PIGEON_NBT_KEYS = Arrays.asList("Air", "ArmorDropChances", "ArmorItems", "Brain", "CanPickUpLoot", "DeathTime", "FallDistance", "FallFlying", "Fire", "HandDropChances", "HandItems", "HurtByTimestamp", "HurtTime", "LeftHanded", "Motion", "NoGravity", "OnGround", "PortalCooldown", "Pos", "Rotation", "Passengers", "Leash", "UUID");
     private final List<ItemStack> stacks = Lists.newArrayList();
 
-    public BirdHouseBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockRegistry.BIRD_HOUSE_BLOCK_ENTITY, pos, state);
+    public BirdhouseBlockEntity(BlockPos pos, BlockState state) {
+        super(BlockRegistry.BIRDHOUSE_BLOCK_ENTITY, pos, state);
     }
 
     public boolean hasPigeon() {
-        return this.pigeon != null;
+        return this.pigeon != null && !this.pigeon.entityData.isEmpty();
     }
 
-    public NbtList getPigeon() {
-        NbtList nbtList = new NbtList();
-        Pigeon pigeon = this.pigeon;
-        NbtCompound nbtCompound = pigeon.entityData.copy();
-        nbtCompound.remove("UUID");
-        NbtCompound nbtCompound2 = new NbtCompound();
-        nbtCompound2.put("EntityData", nbtCompound);
-        nbtList.add(nbtCompound2);
-
-        return nbtList;
+    public NbtCompound getPigeon() {
+        if (this.pigeon != null) {
+            return this.pigeon.entityData.copy();
+        } else {
+            return new NbtCompound();
+        }
     }
 
     public void setPigeon(NbtCompound nbtCompound) {
-        this.pigeon = new BirdHouseBlockEntity.Pigeon(nbtCompound);
+        this.pigeon = new BirdhouseBlockEntity.Pigeon(nbtCompound);
     }
 
     public void enterBirdHouse(Entity entity) {
@@ -80,10 +70,10 @@ public class BirdHouseBlockEntity extends BlockEntity implements IAnimatable {
             this.setPigeon(nbtCompound);
             if (this.world != null) {
                 BlockPos blockPos = this.getPos();
-                this.world.playSound((PlayerEntity)null, (double)blockPos.getX(), (double)blockPos.getY(), (double)blockPos.getZ(), SoundEvents.BLOCK_BEEHIVE_ENTER, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                this.world.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getZ(), SoundEvents.BLOCK_BEEHIVE_ENTER, SoundCategory.BLOCKS, 1.0F, 1.0F);
             }
             entity.discard();
-            super.markDirty();
+            this.updateListeners();
         }
     }
 
@@ -93,8 +83,7 @@ public class BirdHouseBlockEntity extends BlockEntity implements IAnimatable {
             releasePigeon(this.world, this.pos, state, pigeon, entity, player);
             this.pigeon = null;
         }
-        super.markDirty();
-
+        this.updateListeners();
         return entity;
     }
 
@@ -106,13 +95,13 @@ public class BirdHouseBlockEntity extends BlockEntity implements IAnimatable {
         return false;
     }
 
-    private static boolean releasePigeon(World world, BlockPos pos, BlockState state, BirdHouseBlockEntity.Pigeon pigeon, @Nullable Entity currentPigeon, PlayerEntity player) {
+    private static boolean releasePigeon(World world, BlockPos pos, BlockState state, BirdhouseBlockEntity.Pigeon pigeon, @Nullable Entity currentPigeon, PlayerEntity player) {
         NbtCompound nbtCompound = pigeon.entityData.copy();
         removeIrrelevantNbtKeys(nbtCompound);
         nbtCompound.putBoolean("NoGravity", true);
         offerOrDropEnvelope(nbtCompound.getCompound("Envelope"), player);
         nbtCompound.put("Envelope", new NbtCompound());
-        Direction direction = (Direction)state.get(BirdHouseBlock.FACING);
+        Direction direction = state.get(BirdhouseBlock.FACING);
         BlockPos blockPos = pos.offset(direction);
         boolean bl = !world.getBlockState(blockPos).getCollisionShape(world, blockPos).isEmpty();
         if (bl) {
@@ -141,6 +130,34 @@ public class BirdHouseBlockEntity extends BlockEntity implements IAnimatable {
         }
     }
 
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+        this.pigeon = null;
+        NbtCompound pigeon = nbt.getCompound("Pigeon");
+        this.setPigeon(pigeon);
+    }
+
+    protected void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        nbt.put("Pigeon", this.getPigeon());
+    }
+
+    private void updateListeners() {
+        super.markDirty();
+        this.getWorld().updateListeners(this.getPos(), this.getCachedState(), this.getCachedState(), 3);
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientPlayPacketListener> toUpdatePacket() {
+        return BlockEntityUpdateS2CPacket.create(this);
+    }
+
+    @Override
+    public NbtCompound toInitialChunkDataNbt() {
+        return createNbt();
+    }
+
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.bird_house.bag", true));
         return PlayState.CONTINUE;
@@ -148,7 +165,7 @@ public class BirdHouseBlockEntity extends BlockEntity implements IAnimatable {
 
     @Override
     public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController<BirdHouseBlockEntity>(this, "controller", 0, this::predicate));
+        data.addAnimationController(new AnimationController<BirdhouseBlockEntity>(this, "controller", 0, this::predicate));
     }
 
     static void removeIrrelevantNbtKeys(NbtCompound compound) {
@@ -166,7 +183,7 @@ public class BirdHouseBlockEntity extends BlockEntity implements IAnimatable {
         final NbtCompound entityData;
 
         Pigeon(NbtCompound entityData) {
-            BirdHouseBlockEntity.removeIrrelevantNbtKeys(entityData);
+            BirdhouseBlockEntity.removeIrrelevantNbtKeys(entityData);
             this.entityData = entityData;
         }
     }

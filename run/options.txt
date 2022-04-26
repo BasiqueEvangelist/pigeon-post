@@ -29,16 +29,16 @@ simulationDistance:12
 entityDistanceScaling:1.0
 guiScale:4
 particles:0
-maxFps:120
+maxFps:90
 difficulty:2
-graphicsMode:1
-ao:2
+graphicsMode:0
+ao:0
 prioritizeChunkUpdates:0
 biomeBlendRadius:2
 renderClouds:true
-resourcePacks:[]
+resourcePacks:["Fabric Mods"]
 incompatibleResourcePacks:[]
-lastServer:
+lastServer:mgm.spmc.co
 lang:en_us
 soundDevice:
 chatVisibility:0

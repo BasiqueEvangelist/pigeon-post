@@ -1,12 +1,9 @@
 package net.thecorgi.pigeon.common.entity;
 
 import com.google.common.collect.Sets;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.MapColor;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.*;
-import net.minecraft.entity.ai.NoPenaltyTargeting;
 import net.minecraft.entity.ai.control.FlightMoveControl;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.ai.pathing.BirdNavigation;
@@ -19,15 +16,15 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.predicate.entity.EntityPredicates;
+import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.tag.FluidTags;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
@@ -36,12 +33,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
-import net.thecorgi.pigeon.common.block.BirdHouseBlock;
-import net.thecorgi.pigeon.common.block.BirdHouseBlockEntity;
+import net.thecorgi.pigeon.common.block.BirdhouseBlockEntity;
+import net.thecorgi.pigeon.common.entity.ai.SitOnOwnerHeadGoal;
 import net.thecorgi.pigeon.common.registry.ItemRegistry;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -52,14 +48,12 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class PigeonEntity extends TameableEntity implements IAnimatable, Flutterer {
+public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flutterer {
     public static final TrackedData<Integer> VARIANT;
     public static final TrackedData<NbtCompound> ENVELOPE;
-    public static final TrackedData<Boolean> SITTING;
     private final AnimationFactory factory = new AnimationFactory(this);
     private static final Set<Item> TAMING_INGREDIENTS;
     private boolean songPlaying;
@@ -70,11 +64,10 @@ public class PigeonEntity extends TameableEntity implements IAnimatable, Flutter
     static {
         VARIANT = DataTracker.registerData(PigeonEntity.class, TrackedDataHandlerRegistry.INTEGER);
         ENVELOPE = DataTracker.registerData(PigeonEntity.class, TrackedDataHandlerRegistry.NBT_COMPOUND);
-        SITTING = DataTracker.registerData(PigeonEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
         TAMING_INGREDIENTS = Sets.newHashSet(Items.WHEAT_SEEDS, Items.MELON_SEEDS, Items.PUMPKIN_SEEDS, Items.BEETROOT_SEEDS);
     }
 
-    public PigeonEntity(EntityType<? extends TameableEntity> entityType, World world) {
+    public PigeonEntity(EntityType<? extends TameableHeadEntity> entityType, World world) {
         super(entityType, world);
         this.moveControl = new FlightMoveControl(this, 10, false);
         this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, -1.0F);
@@ -89,11 +82,12 @@ public class PigeonEntity extends TameableEntity implements IAnimatable, Flutter
 
     protected void initGoals() {
         this.goalSelector.add(0, new SwimGoal(this));
-        this.goalSelector.add(1, new EscapeGroupDangerGoal(this, 1.25D));
+        this.goalSelector.add(1, new EscapeDangerGoal(this, 1.25D));
+        this.goalSelector.add(2, new SitOnOwnerHeadGoal(this));
         this.goalSelector.add(3, new LookAtEntityGoal(this, PlayerEntity.class, 4.0F));
         this.goalSelector.add(4, new SitGoal(this));
-        this.goalSelector.add(5, new FollowOwnerGoal(this, 1.0D, 5.0F, 1.0F, true));
-        this.goalSelector.add(7, new WanderAroundFarGoal(this, 1.0D));
+        this.goalSelector.add(5, new FollowOwnerGoal(this, 1.0D, 5.0F, 10.0F, true));
+//        this.goalSelector.add(7, new WanderAroundFarGoal(this, 1.0D, 0.0001F));
         this.goalSelector.add(8, new FlyGoal(this, 1.0D));
     }
 
@@ -106,14 +100,12 @@ public class PigeonEntity extends TameableEntity implements IAnimatable, Flutter
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        if (this.hasVehicle()) {
-            return PlayState.STOP;
-        } else if (this.dataTracker.get(SITTING)) {
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.on_stand", true));
-        } else if (this.isInAir()) {
+        if (this.isInAir()) {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.fall_flight", true));
         } else if (this.isSongPlaying()) {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.dance", true));
+        } else if (this.isSitting() || this.hasVehicle()) {
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.on_stand", true));
         } else if (event.isMoving()) {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.walk", true));
         } else {
@@ -136,7 +128,6 @@ public class PigeonEntity extends TameableEntity implements IAnimatable, Flutter
         super.initDataTracker();
         this.dataTracker.startTracking(VARIANT, 0);
         this.dataTracker.startTracking(ENVELOPE, new NbtCompound());
-        this.dataTracker.startTracking(SITTING, false);
     }
 
     public void writeCustomDataToNbt(NbtCompound nbt) {
@@ -172,6 +163,7 @@ public class PigeonEntity extends TameableEntity implements IAnimatable, Flutter
     }
 
     public void tickMovement() {
+        System.out.println(this.isSitting());
         if (this.songSource == null || !this.songSource.isWithinDistance(this.getPos(), 3.46D) || !this.world.getBlockState(this.songSource).isOf(Blocks.JUKEBOX)) {
             this.songPlaying = false;
             this.songSource = null;
@@ -206,26 +198,33 @@ public class PigeonEntity extends TameableEntity implements IAnimatable, Flutter
 
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
-        if (!this.isTamed() && TAMING_INGREDIENTS.contains(stack.getItem())) {
+        if (TAMING_INGREDIENTS.contains(stack.getItem())) {
+            if (!this.isTamed()) {
             if (!player.getAbilities().creativeMode) {
                 stack.decrement(1);
             }
 
             if (!this.isSilent()) {
-                this.world.playSound((PlayerEntity)null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
+                this.world.playSound((PlayerEntity) null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
             }
 
             if (!this.world.isClient) {
-                if (this.random.nextInt(10) == 0) {
+                if (this.random.nextInt(8) == 0) {
                     this.setOwner(player);
-                    this.world.sendEntityStatus(this, (byte)7);
+                    this.world.sendEntityStatus(this, (byte) 7);
                 } else {
-                    this.world.sendEntityStatus(this, (byte)6);
+                    this.world.sendEntityStatus(this, (byte) 6);
                 }
             }
 
+        } else {
+                if (this.getHealth() < this.getMaxHealth()) {
+                    this.heal(1.5F);
+                    this.world.addImportantParticle(ParticleTypes.HEART, this.getX(), this.getY(), this.getZ(), 0, 0.02, 0);
+                }
+            }
             return ActionResult.success(this.world.isClient);
-        } else if (this.isOwner(player) && stack.isOf(ItemRegistry.ENVELOPE) && player.isSneaking()) {
+        } else if (this.isOwner(player) && stack.isOf(ItemRegistry.ENVELOPE)) {
             NbtCompound nbtCompound = stack.getOrCreateNbt();
             if (nbtCompound.contains("Address") && nbtCompound.contains("Envelope")) {
                 if (!player.getAbilities().creativeMode) {
@@ -237,10 +236,11 @@ public class PigeonEntity extends TameableEntity implements IAnimatable, Flutter
                     BlockPos pos = new BlockPos(BlockPos.unpackLongX(l), BlockPos.unpackLongY(l), BlockPos.unpackLongZ(l));
 
                     BlockEntity blockEntity = world.getBlockEntity(pos);
-                    if (blockEntity instanceof BirdHouseBlockEntity birdHouse) {
+                    if (blockEntity instanceof BirdhouseBlockEntity birdHouse) {
                         if (!birdHouse.hasPigeon()) {
                             this.setEnvelope(nbtCompound.getCompound("Envelope"));
                             this.stopRiding();
+                            this.setSitting(false);
                             birdHouse.enterBirdHouse(this);
                         } else {
                             player.sendMessage(new TranslatableText("item.pigeon.envelope.bird_house_full").formatted(Formatting.RED), true);
@@ -252,10 +252,8 @@ public class PigeonEntity extends TameableEntity implements IAnimatable, Flutter
 
                 return ActionResult.success(this.world.isClient);
             }
-        } else if (this.isTamed() && this.isOwner(player) && player.isSneaking()) {
-            if (!player.hasPassenger(this)) {
-                this.startRiding(player);
-            }
+        } else if (this.isTamed() && this.isOwner(player) && this.isOnGround()) {
+            this.setSitting(!this.isSitting());
         } else {
             return super.interactMob(player, hand);
         }
@@ -283,38 +281,31 @@ public class PigeonEntity extends TameableEntity implements IAnimatable, Flutter
         return !this.onGround;
     }
 
-    public boolean isPushable() {
-        return true;
-    }
-
     protected void pushAway(Entity entity) {
         if (!(entity instanceof PlayerEntity)) {
             super.pushAway(entity);
         }
     }
 
-    public boolean damage(DamageSource source, float amount) {
-        if (this.isInvulnerableTo(source)) {
-            return false;
-        } else {
-            this.setSitting(false);
-            if (!world.isClient) {
-                Entity attacker = source.getAttacker();
-                if ((attacker != null) && attacker.isLiving()) {
-                    Box box = this.getBoundingBox().expand(7.0F, 7.0F, 7.0F);
-                    List<PigeonEntity> pigeons = this.world.getEntitiesByClass(PigeonEntity.class, box, EntityPredicates.VALID_LIVING_ENTITY);
-                    if (!this.isOwner((LivingEntity) attacker)) {
-                        pigeons.iterator().next().fleeFromEntity(attacker);
-                    }
-                }
-            }
-            return super.damage(source, amount);
-        }
-    }
+//    public boolean damage(DamageSource source, float amount) {
+//        if (this.isInvulnerableTo(source)) {
+//            return false;
+//        } else {
+//            this.setSitting(false);
+//            if (!world.isClient) {
+//                Entity attacker = source.getAttacker();
+//                if ((attacker != null) && attacker.isLiving()) {
+//                    Box box = this.getBoundingBox().expand(7.0F, 7.0F, 7.0F);
+//                    List<PigeonEntity> pigeons = this.world.getEntitiesByClass(PigeonEntity.class, box, EntityPredicates.VALID_LIVING_ENTITY);
+//                    if (!this.isOwner((LivingEntity) attacker)) {
+//                        pigeons.iterator().next().fleeFromPlayer();
+//                    }
+//                }
+//            }
+//            return super.damage(source, amount);
+//        }
+//    }
 
-    protected void fleeFromEntity(Entity entity) {
-        this.fleeingTicks = 60;
-    }
 
     @Override
     public void tickRiding() {
@@ -326,30 +317,6 @@ public class PigeonEntity extends TameableEntity implements IAnimatable, Flutter
                 if (!vehicle.isOnGround()) {
                     this.dismountVehicle();
                 }
-        }
-    }
-
-    public class EscapeGroupDangerGoal extends EscapeDangerGoal {
-        public static final int field_36271 = 1;
-        protected final PigeonEntity mob;
-        protected final double speed;
-        protected double targetX;
-        protected double targetY;
-        protected double targetZ;
-        protected boolean active;
-
-        public EscapeGroupDangerGoal(PigeonEntity mob, double speed) {
-            super(mob, speed);
-            this.mob = mob;
-            this.speed = speed;
-        }
-
-        public boolean canStart() {
-            if (mob.fleeingTicks > 0) {
-                return true;
-            }
-            super.canStart();
-            return false;
         }
     }
 }

@@ -26,12 +26,6 @@ dependencies {
 
 	// GeckoLib
 	modImplementation "software.bernie.geckolib:geckolib-fabric-1.18:${project.geckolib_version}"
-
-//	// components
-//	modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:4.0.1"
-//
-	// LibGUI
-//	modImplementation include("io.github.cottonmc:LibGui:5.3.0+1.18")
 }
 
 processResources {
