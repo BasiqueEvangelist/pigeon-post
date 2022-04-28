@@ -1,13 +1,13 @@
 {
   "entity.pigeon.pigeon": "Pigeon",
   "item.pigeon.pigeon_spawn_egg": "Pigeon Spawn Egg",
-  "block.pigeon.bird_house": "Birdhouse",
+  "block.pigeon.birdhouse": "Birdhouse",
   "item.pigeon.envelope": "Envelope",
   "item.pigeon.envelope.contains_address": "Addressed to: %s, %s, %s",
   "item.pigeon.envelope.give_to_pigeon": "A pigeon sure would appreciate this..",
   "item.pigeon.envelope.empty": "Shift-click Bird House to set address",
-  "item.pigeon.envelope.bird_house_full": "Address occupied by another pigeon",
-  "item.pigeon.envelope.not_valid_bird_house": "Address is not valid bird house",
+  "item.pigeon.envelope.birdhouse_full": "Address occupied by another pigeon",
+  "item.pigeon.envelope.not_valid_birdhouse": "Address is not valid bird house",
   "container.pigeon.envelope": "Envelope",
   "itemGroup.pigeon.general": "Pigeon Post"
 }

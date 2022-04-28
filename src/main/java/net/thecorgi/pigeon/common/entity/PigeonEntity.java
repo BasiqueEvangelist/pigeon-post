@@ -53,17 +53,17 @@ import java.util.Set;
 
 public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flutterer {
     public static final TrackedData<Integer> VARIANT;
-    public static final TrackedData<NbtCompound> ENVELOPE;
+//    public static final TrackedData<NbtCompound> ENVELOPE;
     private final AnimationFactory factory = new AnimationFactory(this);
     private static final Set<Item> TAMING_INGREDIENTS;
     private boolean songPlaying;
+    private NbtCompound envelope;
     @Nullable
     private BlockPos songSource;
-    private int fleeingTicks = 0;
 
     static {
         VARIANT = DataTracker.registerData(PigeonEntity.class, TrackedDataHandlerRegistry.INTEGER);
-        ENVELOPE = DataTracker.registerData(PigeonEntity.class, TrackedDataHandlerRegistry.NBT_COMPOUND);
+//        ENVELOPE = DataTracker.registerData(PigeonEntity.class, TrackedDataHandlerRegistry.NBT_COMPOUND);
         TAMING_INGREDIENTS = Sets.newHashSet(Items.WHEAT_SEEDS, Items.MELON_SEEDS, Items.PUMPKIN_SEEDS, Items.BEETROOT_SEEDS);
     }
 
@@ -127,19 +127,19 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(VARIANT, 0);
-        this.dataTracker.startTracking(ENVELOPE, new NbtCompound());
+//        this.dataTracker.startTracking(ENVELOPE, new NbtCompound());
     }
 
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putInt("Variant", this.getVariant());
-        nbt.put("Envelope", this.getEnvelope());
+//        nbt.put("Envelope", this.getEnvelope());
     }
 
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.setVariant(nbt.getInt("Variant"));
-        this.setEnvelope(nbt.getCompound("Envelope"));
+//        this.setEnvelope(nbt.getCompound("Envelope"));
     }
 
     public int getVariant() {
@@ -151,19 +151,19 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
     }
 
     public NbtCompound getEnvelope() {
-        return this.dataTracker.get(ENVELOPE);
+        return this.envelope;
     }
 
-    public void setEnvelope(NbtCompound envelope) {
-        this.dataTracker.set(ENVELOPE, envelope);
+    public void setEnvelope(NbtCompound nbtCompound) {
+        this.envelope = nbtCompound;
     }
+
 
     public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
         return false;
     }
 
     public void tickMovement() {
-        System.out.println(this.isSitting());
         if (this.songSource == null || !this.songSource.isWithinDistance(this.getPos(), 3.46D) || !this.world.getBlockState(this.songSource).isOf(Blocks.JUKEBOX)) {
             this.songPlaying = false;
             this.songSource = null;
@@ -173,8 +173,6 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
         if (!this.onGround && vec3d.y < 0.0D) {
             this.setVelocity(vec3d.multiply(1.0D, 0.55D, 1.0D));
         }
-
-        if (this.fleeingTicks > 0) { --fleeingTicks; }
 
         this.flapWings();
         super.tickMovement();
@@ -243,10 +241,10 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
                             this.setSitting(false);
                             birdHouse.enterBirdHouse(this);
                         } else {
-                            player.sendMessage(new TranslatableText("item.pigeon.envelope.bird_house_full").formatted(Formatting.RED), true);
+                            player.sendMessage(new TranslatableText("item.pigeon.envelope.birdhouse_full").formatted(Formatting.RED), true);
                         }
                     } else {
-                        player.sendMessage(new TranslatableText("item.pigeon.envelope.not_valid_bird_house").formatted(Formatting.RED), true);
+                        player.sendMessage(new TranslatableText("item.pigeon.envelope.not_valid_birdhouse").formatted(Formatting.RED), true);
                     }
                 }
 
@@ -310,7 +308,6 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
     @Override
     public void tickRiding() {
         super.tickRiding();
-        this.fleeingTicks = 0;
         Entity vehicle = this.getVehicle();
         if (vehicle != null) {
             if (vehicle instanceof PlayerEntity)

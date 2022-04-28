@@ -36,7 +36,6 @@ public class SitOnOwnerHeadGoal extends Goal {
         if (!this.mounted && !this.tameable.isSitting() && !this.tameable.isLeashed()) {
             if (this.tameable.getBoundingBox().intersects(this.owner.getBoundingBox())) {
                 this.tameable.mountOnHead(this.owner);
-                System.out.println("MOUNTING");
             }
 
         }

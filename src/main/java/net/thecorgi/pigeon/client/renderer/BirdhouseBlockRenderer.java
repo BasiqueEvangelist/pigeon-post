@@ -23,15 +23,8 @@ public class BirdhouseBlockRenderer extends GeoBlockRenderer<BirdhouseBlockEntit
                        int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 
         Optional<GeoBone> bag = model.getBone("bag");
-        System.out.println(bag.isPresent());
         if (bag.isPresent()) {
-            if (animatable.hasPigeon()) {
-                model.getBone("bag").get().setHidden(false);
-                System.out.println("BAGBAGBAGBAG");
-            } else {
-                model.getBone("bag").get().setHidden(true);
-                System.out.println("NO BAG DETECTED");
-            }
+            model.getBone("bag").get().setHidden(!animatable.hasPigeon());
         }
 
         super.render(model, animatable, partialTicks, type, matrixStackIn, renderTypeBuffer, vertexBuilder,

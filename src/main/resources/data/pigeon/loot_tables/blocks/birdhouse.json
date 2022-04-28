@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "pigeon:bird_house"
+          "name": "pigeon:birdhouse"
         }
       ],
       "conditions": [

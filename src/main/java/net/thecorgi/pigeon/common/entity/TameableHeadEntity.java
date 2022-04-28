@@ -29,6 +29,6 @@ public abstract class TameableHeadEntity extends TameableEntity {
     }
 
     public boolean isReadyToSitOnPlayer() {
-        return this.ticks > 100;
+        return this.ticks > READY_TO_SIT_COOLDOWN;
     }
 }

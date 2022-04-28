@@ -36,8 +36,6 @@ import java.util.Optional;
 public class BirdhouseBlockEntity extends BlockEntity implements IAnimatable {
     private AnimationFactory factory = new AnimationFactory(this);
     private Pigeon pigeon;
-    public static final String ENVELOPE_KEY = "Envelope";
-    public static final String VARIANT_KEY = "Variant";
     private static final List<String> IRRELEVANT_PIGEON_NBT_KEYS = Arrays.asList("Air", "ArmorDropChances", "ArmorItems", "Brain", "CanPickUpLoot", "DeathTime", "FallDistance", "FallFlying", "Fire", "HandDropChances", "HandItems", "HurtByTimestamp", "HurtTime", "LeftHanded", "Motion", "NoGravity", "OnGround", "PortalCooldown", "Pos", "Rotation", "Passengers", "Leash", "UUID");
     private final List<ItemStack> stacks = Lists.newArrayList();
 
@@ -67,6 +65,7 @@ public class BirdhouseBlockEntity extends BlockEntity implements IAnimatable {
             entity.removeAllPassengers();
             NbtCompound nbtCompound = new NbtCompound();
             entity.saveNbt(nbtCompound);
+            System.out.println(nbtCompound);
             this.setPigeon(nbtCompound);
             if (this.world != null) {
                 BlockPos blockPos = this.getPos();
@@ -80,6 +79,7 @@ public class BirdhouseBlockEntity extends BlockEntity implements IAnimatable {
     public Entity tryReleasePigeon(BlockState state, PlayerEntity player) {
         Entity entity = new PigeonEntity(EntityRegistry.PIGEON, this.world);
         if (pigeon != null && world != null) {
+            System.out.println("Releasing: " + entity);
             releasePigeon(this.world, this.pos, state, pigeon, entity, player);
             this.pigeon = null;
         }
@@ -97,9 +97,13 @@ public class BirdhouseBlockEntity extends BlockEntity implements IAnimatable {
 
     private static boolean releasePigeon(World world, BlockPos pos, BlockState state, BirdhouseBlockEntity.Pigeon pigeon, @Nullable Entity currentPigeon, PlayerEntity player) {
         NbtCompound nbtCompound = pigeon.entityData.copy();
+        System.out.println(nbtCompound);
         removeIrrelevantNbtKeys(nbtCompound);
         nbtCompound.putBoolean("NoGravity", true);
+
+        System.out.println(nbtCompound.getCompound("Envelope"));
         offerOrDropEnvelope(nbtCompound.getCompound("Envelope"), player);
+
         nbtCompound.put("Envelope", new NbtCompound());
         Direction direction = state.get(BirdhouseBlock.FACING);
         BlockPos blockPos = pos.offset(direction);
@@ -108,6 +112,7 @@ public class BirdhouseBlockEntity extends BlockEntity implements IAnimatable {
             return false;
         } else {
             Optional<Entity> entity = EntityType.getEntityFromNbt(nbtCompound, world);
+            System.out.println("Entity: " + entity);
             if (entity.isPresent()) {
                 Entity entityx = entity.get();
                 if (entity.get() instanceof PigeonEntity pigeonEntity) {
