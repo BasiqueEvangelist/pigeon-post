@@ -51,16 +51,16 @@ public abstract class PlayerEntityMixin extends Entity {
 
     @Override
     public void updatePassengerPosition(Entity passenger) {
-        if (!(passenger instanceof TameableHeadEntity) || !this.hasPassenger(passenger)) return;
-
-        System.out.println(passenger);
-        passenger.setPosition(
-                this.getX(),
-                this.getY() + this.getMountedHeightOffset() + passenger.getHeightOffset() + 0.35,
-                this.getZ()
-        );
-        passenger.setYaw(this.getYaw());
-        passenger.setPitch(this.getPitch());
-        super.updatePassengerPosition(passenger);
+        if (passenger.getType() == EntityRegistry.PIGEON) {
+            System.out.println(passenger);
+            passenger.setPosition(
+                    this.getX(),
+                    this.getY() + this.getMountedHeightOffset() + passenger.getHeightOffset() + 0.35,
+                    this.getZ()
+            );
+            passenger.setYaw(this.getYaw());
+            passenger.setPitch(this.getPitch());
+            super.updatePassengerPosition(passenger);
+        }
     }
 }

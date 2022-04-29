@@ -53,7 +53,6 @@ import java.util.Set;
 
 public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flutterer {
     public static final TrackedData<Integer> VARIANT;
-//    public static final TrackedData<NbtCompound> ENVELOPE;
     private final AnimationFactory factory = new AnimationFactory(this);
     private static final Set<Item> TAMING_INGREDIENTS;
     private boolean songPlaying;
@@ -63,7 +62,6 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
 
     static {
         VARIANT = DataTracker.registerData(PigeonEntity.class, TrackedDataHandlerRegistry.INTEGER);
-//        ENVELOPE = DataTracker.registerData(PigeonEntity.class, TrackedDataHandlerRegistry.NBT_COMPOUND);
         TAMING_INGREDIENTS = Sets.newHashSet(Items.WHEAT_SEEDS, Items.MELON_SEEDS, Items.PUMPKIN_SEEDS, Items.BEETROOT_SEEDS);
     }
 
@@ -87,7 +85,6 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
         this.goalSelector.add(3, new LookAtEntityGoal(this, PlayerEntity.class, 4.0F));
         this.goalSelector.add(4, new SitGoal(this));
         this.goalSelector.add(5, new FollowOwnerGoal(this, 1.0D, 5.0F, 10.0F, true));
-//        this.goalSelector.add(7, new WanderAroundFarGoal(this, 1.0D, 0.0001F));
         this.goalSelector.add(8, new FlyGoal(this, 1.0D));
     }
 
@@ -100,11 +97,15 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+        if (this.hasVehicle()) {
+//            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.on_stand", true));
+            return PlayState.STOP;
+        }
         if (this.isInAir()) {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.fall_flight", true));
         } else if (this.isSongPlaying()) {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.dance", true));
-        } else if (this.isSitting() || this.hasVehicle()) {
+        } else if (this.isSitting()) {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.on_stand", true));
         } else if (event.isMoving()) {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.walk", true));
@@ -133,13 +134,13 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putInt("Variant", this.getVariant());
-//        nbt.put("Envelope", this.getEnvelope());
+        nbt.put("Envelope", this.getEnvelope());
     }
 
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.setVariant(nbt.getInt("Variant"));
-//        this.setEnvelope(nbt.getCompound("Envelope"));
+        this.setEnvelope(nbt.getCompound("Envelope"));
     }
 
     public int getVariant() {
