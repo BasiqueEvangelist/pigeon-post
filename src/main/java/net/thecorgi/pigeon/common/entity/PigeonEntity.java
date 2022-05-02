@@ -21,8 +21,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.TranslatableText;
@@ -30,14 +28,12 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.thecorgi.pigeon.common.block.BirdhouseBlockEntity;
-import net.thecorgi.pigeon.common.entity.ai.SitOnOwnerHeadGoal;
 import net.thecorgi.pigeon.common.registry.ItemRegistry;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -48,7 +44,6 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
-import java.util.List;
 import java.util.Set;
 
 public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flutterer {
@@ -78,14 +73,14 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.14F);
     }
 
+
     protected void initGoals() {
         this.goalSelector.add(0, new SwimGoal(this));
         this.goalSelector.add(1, new EscapeDangerGoal(this, 1.25D));
-        this.goalSelector.add(2, new SitOnOwnerHeadGoal(this));
-        this.goalSelector.add(3, new LookAtEntityGoal(this, PlayerEntity.class, 4.0F));
-        this.goalSelector.add(4, new SitGoal(this));
-        this.goalSelector.add(5, new FollowOwnerGoal(this, 1.0D, 5.0F, 10.0F, true));
-        this.goalSelector.add(8, new FlyGoal(this, 1.0D));
+        this.goalSelector.add(2, new LookAtEntityGoal(this, PlayerEntity.class, 4.0F));
+        this.goalSelector.add(3, new SitGoal(this));
+        this.goalSelector.add(4, new FollowOwnerGoal(this, 1.0D, 5.0F, 10.0F, true));
+        this.goalSelector.add(5, new FlyGoal(this, 1.0D));
     }
 
     protected EntityNavigation createNavigation(World world) {
@@ -98,10 +93,8 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         if (this.hasVehicle()) {
-//            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.on_stand", true));
             return PlayState.STOP;
-        }
-        if (this.isInAir()) {
+        } else if (this.isInAir()) {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.fall_flight", true));
         } else if (this.isSongPlaying()) {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.dance", true));
@@ -128,7 +121,6 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(VARIANT, 0);
-//        this.dataTracker.startTracking(ENVELOPE, new NbtCompound());
     }
 
     public void writeCustomDataToNbt(NbtCompound nbt) {
@@ -158,7 +150,6 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
     public void setEnvelope(NbtCompound nbtCompound) {
         this.envelope = nbtCompound;
     }
-
 
     public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
         return false;
@@ -199,24 +190,24 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
         ItemStack stack = player.getStackInHand(hand);
         if (TAMING_INGREDIENTS.contains(stack.getItem())) {
             if (!this.isTamed()) {
-            if (!player.getAbilities().creativeMode) {
-                stack.decrement(1);
-            }
-
-            if (!this.isSilent()) {
-                this.world.playSound((PlayerEntity) null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
-            }
-
-            if (!this.world.isClient) {
-                if (this.random.nextInt(8) == 0) {
-                    this.setOwner(player);
-                    this.world.sendEntityStatus(this, (byte) 7);
-                } else {
-                    this.world.sendEntityStatus(this, (byte) 6);
+                if (!player.getAbilities().creativeMode) {
+                    stack.decrement(1);
                 }
-            }
 
-        } else {
+                if (!this.isSilent()) {
+                    this.world.playSound((PlayerEntity) null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
+                }
+
+                if (!this.world.isClient) {
+                    if (this.random.nextInt(8) == 0) {
+                        this.setOwner(player);
+                        this.world.sendEntityStatus(this, (byte) 7);
+                    } else {
+                        this.world.sendEntityStatus(this, (byte) 6);
+                    }
+                }
+
+            } else {
                 if (this.getHealth() < this.getMaxHealth()) {
                     this.heal(1.5F);
                     this.world.addImportantParticle(ParticleTypes.HEART, this.getX(), this.getY(), this.getZ(), 0, 0.02, 0);
@@ -251,7 +242,9 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
 
                 return ActionResult.success(this.world.isClient);
             }
-        } else if (this.isTamed() && this.isOwner(player) && this.isOnGround()) {
+        } else if (this.isTamed() && this.isOwner(player) && player.isSneaking()) {
+            this.mountOnHead(player);
+        } else if (this.isTamed() && this.isOwner(player) && this.isOnGround() && !player.isSneaking()) {
             this.setSitting(!this.isSitting());
         } else {
             return super.interactMob(player, hand);
@@ -286,35 +279,9 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
         }
     }
 
-//    public boolean damage(DamageSource source, float amount) {
-//        if (this.isInvulnerableTo(source)) {
-//            return false;
-//        } else {
-//            this.setSitting(false);
-//            if (!world.isClient) {
-//                Entity attacker = source.getAttacker();
-//                if ((attacker != null) && attacker.isLiving()) {
-//                    Box box = this.getBoundingBox().expand(7.0F, 7.0F, 7.0F);
-//                    List<PigeonEntity> pigeons = this.world.getEntitiesByClass(PigeonEntity.class, box, EntityPredicates.VALID_LIVING_ENTITY);
-//                    if (!this.isOwner((LivingEntity) attacker)) {
-//                        pigeons.iterator().next().fleeFromPlayer();
-//                    }
-//                }
-//            }
-//            return super.damage(source, amount);
-//        }
-//    }
 
-
-    @Override
-    public void tickRiding() {
-        super.tickRiding();
-        Entity vehicle = this.getVehicle();
-        if (vehicle != null) {
-            if (vehicle instanceof PlayerEntity)
-                if (!vehicle.isOnGround()) {
-                    this.dismountVehicle();
-                }
-        }
+    public double getHeightOffset() {
+        return 0.5D;
     }
 }
+

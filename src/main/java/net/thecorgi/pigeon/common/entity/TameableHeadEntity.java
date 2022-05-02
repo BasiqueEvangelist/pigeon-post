@@ -3,6 +3,7 @@ package net.thecorgi.pigeon.common.entity;
 import net.minecraft.client.render.entity.GiantEntityRenderer;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
