@@ -4,31 +4,32 @@
   "version": "${version}",
 
   "name": "Pigeon Post",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "Ever wanted to send a package? Consider pigeon mail!",
   "authors": [
-    "Me!"
+    "corgi in tights#5131",
+    "THE_(Irish)_MAN1!#3274",
+    "reider#4225"
   ],
   "contact": {
     "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "sources": "https://github.com/corgi-in-tights/pigeon-post",
+    "issues": "https://github.com/corgi-in-tights/pigeon-post/issues"
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/pigeon/icon.png",
+  "icon": "assets/pigeonpost/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.thecorgi.pigeon.PigeonPost"
-    ],
-    "cardinal-components-entity": [
+      "net.thecorgi.pigeonpost.PigeonPost"
     ],
     "client": [
-      "net.thecorgi.pigeon.client.PigeonPostClient"
+      "net.thecorgi.pigeonpost.client.PigeonPostClient"
     ]
   },
   "mixins": [
-    "pigeon.mixins.json"
+    "pigeonpost.mixins.json"
   ],
 
   "depends": {
@@ -36,13 +37,5 @@
     "fabric": "*",
     "minecraft": "1.18.x",
     "java": ">=17"
-  },
-  "suggests": {
-    "another-mod": "*"
-  },
-
-  "custom": {
-    "cardinal-components": [
-    ]
   }
 }

@@ -12,6 +12,7 @@ group = project.maven_group
 
 repositories {
 	maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+	maven {	url = "https://server.bbkr.space/artifactory/libs-release"	}
 //	maven { url = 'https://ladysnake.jfrog.io/artifactory/mods' }
 //	maven { url = "https://server.bbkr.space/artifactory/libs-release" }
 }
@@ -26,6 +27,9 @@ dependencies {
 
 	// GeckoLib
 	modImplementation "software.bernie.geckolib:geckolib-fabric-1.18:${project.geckolib_version}"
+
+	// LibGUI
+	modImplementation include("io.github.cottonmc:LibGui:5.3.1+1.18")
 }
 
 processResources {

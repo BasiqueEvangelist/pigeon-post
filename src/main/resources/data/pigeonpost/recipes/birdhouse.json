@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " _ ",
+    "_L_",
+    "OOO"
+  ],
+  "key": {
+    "_": {
+      "tag": "minecraft:wooden_slabs"
+    },
+    "L": {
+      "item": "minecraft:lantern"
+    },
+    "O": {
+      "tag": "minecraft:logs"
+    }
+  },
+  "result": {}
+}
