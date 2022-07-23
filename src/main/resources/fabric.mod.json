@@ -1,17 +1,16 @@
 {
   "schemaVersion": 1,
-  "id": "pigeon",
+  "id": "pigeonpost",
   "version": "${version}",
 
   "name": "Pigeon Post",
-  "description": "Ever wanted to send a package? Consider pigeon mail!",
+  "description": "Delivering a package? Consider pigeon mail!",
   "authors": [
     "corgi in tights#5131",
     "THE_(Irish)_MAN1!#3274",
     "reider#4225"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
     "sources": "https://github.com/corgi-in-tights/pigeon-post",
     "issues": "https://github.com/corgi-in-tights/pigeon-post/issues"
   },

@@ -93,13 +93,13 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
         if (this.hasVehicle()) {
             return PlayState.STOP;
         } else if (this.isInAir()) {
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeonpost.fall_flight", true));
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.fall_flight", true));
         } else if (this.isSongPlaying()) {
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeonpost.dance", true));
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.dance", true));
         } else if (this.isSitting()) {
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeonpost.on_stand", true));
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.on_stand", true));
         } else if (event.isMoving()) {
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeonpost.walk", true));
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.pigeon.walk", true));
         } else {
             return PlayState.STOP;
         }
@@ -221,32 +221,6 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
             }
             return ActionResult.success(this.world.isClient);
         }
-//        else if (this.isOwner(player) && stack.isOf(ItemRegistry.ENVELOPE)) {
-//            NbtCompound nbtCompound = stack.getOrCreateNbt();
-//            if (nbtCompound.contains("Address") && nbtCompound.contains("Envelope")) {
-//                if (!player.getAbilities().creativeMode) {
-//                    stack.decrement(1);
-//                }
-//
-//                if (!this.world.isClient) {
-//                    long l = stack.getOrCreateNbt().getLong("Address");
-//                    BlockPos pos = new BlockPos(BlockPos.unpackLongX(l), BlockPos.unpackLongY(l), BlockPos.unpackLongZ(l));
-//
-//                    "Envelope"
-//////                            this.navigation.startMovingTo(pos.getX(), pos.getY(), pos.getZ(), 1D);
-//////                            this.setHasLocation(true);
-//////                            this.setPosition(Vec3d.ofCenter(pos));
-////                        } else {
-////                            player.sendMessage(new TranslatableText("envelope.pigeonpost.envelope.birdhouse_full").formatted(Formatting.RED), true);
-////                        }
-////                    } else {
-////                        player.sendMessage(new TranslatableText("envelope.pigeonpost.envelope.not_valid_birdhouse").formatted(Formatting.RED), true);
-////                    }
-//                }
-//
-//                return ActionResult.success(this.world.isClient);
-//            }
-//        }
         else if (this.isTamed() && this.isOwner(player) && player.isSneaking()) {
             this.mountOnHead(player);
         } else if (this.isTamed() && this.isOwner(player) && this.isOnGround() && !player.isSneaking()) {

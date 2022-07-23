@@ -11,17 +11,17 @@ import software.bernie.geckolib3.model.provider.data.EntityModelData;
 public class PigeonEntityModel extends AnimatedGeoModel<PigeonEntity> {
     @Override
     public Identifier getModelLocation(PigeonEntity object) {
-        return PigeonPost.id("geo/pigeonpost.geo.json");
+        return PigeonPost.id("geo/pigeon.geo.json");
     }
 
     @Override
     public Identifier getTextureLocation(PigeonEntity object) {
-        return PigeonPost.id("textures/entity/pigeonpost/pigeon_" + object.getVariant() + ".png");
+        return PigeonPost.id("textures/entity/pigeon/pigeon_" + object.getVariant() + ".png");
     }
 
     @Override
     public Identifier getAnimationFileLocation(PigeonEntity object) {
-        return PigeonPost.id("animations/pigeonpost.animation.json");
+        return PigeonPost.id("animations/pigeon.animation.json");
     }
 
     @Override

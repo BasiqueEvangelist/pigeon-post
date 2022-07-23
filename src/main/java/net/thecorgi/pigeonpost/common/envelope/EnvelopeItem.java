@@ -31,7 +31,7 @@ public class EnvelopeItem extends Item implements NamedScreenHandlerFactory {
     public static final String ITEMS_KEY = "Items";
     public static final String ADDRESS_KEY = "Address";
 
-    public static final Identifier ID = new Identifier(PigeonPost.ModID, "envelope.gui");
+    public static final Identifier ID = PigeonPost.id("envelope.gui");
 
     static int size = 3;
     private static final int ITEM_BAR_COLOR = MathHelper.packRgb(1.0F, 0.55F, 0.1F);
@@ -56,12 +56,7 @@ public class EnvelopeItem extends Item implements NamedScreenHandlerFactory {
     }
 
     public int getItemBarStep(ItemStack stack) {
-        SimpleInventory inv = new SimpleInventory();
-        inv.readNbtList(stack.getOrCreateNbt().getList(ITEMS_KEY, 10));
-
-        return 6;
-
-//        return Math.min(Math.round(inv.size() / size * 10) / 10 * 13, 13);
+        return Math.min(Math.round(13F / size * getStoredItems(stack).count()), 13);
     }
 
     public int getItemBarColor(ItemStack stack) {
@@ -146,7 +141,7 @@ public class EnvelopeItem extends Item implements NamedScreenHandlerFactory {
             stack.setNbt(nbtCompound);
         }
 
-        NamedScreenHandlerFactory factory = new SimpleNamedScreenHandlerFactory((syncId, inventory, user) -> new EnvelopeGuiDescription(syncId, inventory, stack), new TranslatableText("envelope.pigeonpost.envelope"));
+        NamedScreenHandlerFactory factory = new SimpleNamedScreenHandlerFactory((syncId, inventory, user) -> new EnvelopeGuiDescription(syncId, inventory, stack), new TranslatableText("item.pigeonpost.envelope.gui"));
         player.openHandledScreen(factory);
 
         return TypedActionResult.success(player.getStackInHand(hand));
@@ -167,15 +162,15 @@ public class EnvelopeItem extends Item implements NamedScreenHandlerFactory {
             int y = BlockPos.unpackLongY(pos);
             int z = BlockPos.unpackLongZ(pos);
 
-            tooltip.add(new TranslatableText("envelope.pigeonpost.envelope.address.valid", Integer.toString(x), Integer.toString(y), Integer.toString(z)).formatted(Formatting.GRAY));
+            tooltip.add(new TranslatableText("item.pigeonpost.envelope.address.valid", Integer.toString(x), Integer.toString(y), Integer.toString(z)).formatted(Formatting.GRAY));
         } else {
-            tooltip.add(new TranslatableText("envelope.pigeonpost.envelope.address.empty").formatted(Formatting.GRAY));
+            tooltip.add(new TranslatableText("item.pigeonpost.envelope.address.empty").formatted(Formatting.GRAY));
         }
     }
 
     @Override
     public Text getDisplayName() {
-        return new TranslatableText("item.pigeonpost.envelope.gui.title");
+        return new TranslatableText("item.pigeonpost.envelope.gui");
     }
 
     @Nullable

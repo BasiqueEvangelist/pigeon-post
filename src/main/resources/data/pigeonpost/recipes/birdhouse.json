@@ -16,5 +16,8 @@
       "tag": "minecraft:logs"
     }
   },
-  "result": {}
+  "result": {
+    "item": "pigeonpost:birdhouse",
+    "count": 1
+  }
 }

@@ -14,7 +14,7 @@ import static net.thecorgi.pigeonpost.PigeonPost.id;
 public class EntityRegistry {
     public static final EntityType<PigeonEntity> PIGEON = Registry.register(
             Registry.ENTITY_TYPE,
-            id("pigeonpost"),
+            id("pigeon"),
             FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, PigeonEntity::new).trackRangeBlocks(10).dimensions(EntityDimensions.fixed(0.65f, 0.65f)).build()
     );
 

@@ -3,12 +3,13 @@
   "item.pigeonpost.pigeon_spawn_egg": "Pigeon Spawn Egg",
   "block.pigeonpost.birdhouse": "Birdhouse",
   "item.pigeonpost.envelope": "Envelope",
-  "item.pigeonpost.envelope.gui.title": "Set Address",
+  "item.pigeonpost.envelope.gui": "Set Address",
 
   "item.pigeonpost.envelope.address.valid": "XYZ: %s %s %s",
   "item.pigeonpost.envelope.address.empty": "No address set",
-  "item.pigeonpost.envelope.birdhouse_full": "Address occupied by another Pigeon",
-  "item.pigeonpost.envelope.not_valid_birdhouse": "Address is NOT a birdhouse",
+
+  "block.pigeonpost.birdhouse.full": "Address occupied by another pigeon.",
+  "block.pigeonpost.birdhouse.invalid": "No birdhouse found at address.",
 
   "itemGroup.pigeonpost.general": "Pigeon Post"
 }

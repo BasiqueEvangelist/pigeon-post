@@ -44,9 +44,6 @@ public class EnvelopeGuiDescription extends SyncedGuiDescription {
         root.setInsets(Insets.ROOT_PANEL);
 
         NbtCompound nbtCompound = envelope.getOrCreateNbt();
-        long x = BlockPos.unpackLongX(nbtCompound.getLong(EnvelopeItem.ADDRESS_KEY));
-        long y = BlockPos.unpackLongY(nbtCompound.getLong(EnvelopeItem.ADDRESS_KEY));
-        long z = BlockPos.unpackLongZ(nbtCompound.getLong(EnvelopeItem.ADDRESS_KEY));
 
         WLabel xLabel = new WLabel(new LiteralText("X"));
         root.add(xLabel, 27, 16);
@@ -60,17 +57,20 @@ public class EnvelopeGuiDescription extends SyncedGuiDescription {
         root.add(fieldX, 8, 25);
         fieldX.setSize(44, 15);
         fieldX.setTextPredicate(coordsPredicate);
-        fieldX.setText(String.valueOf(x));
 
         root.add(fieldY, 62, 25);
         fieldY.setSize(44, 15);
         fieldY.setTextPredicate(coordsPredicate);
-        fieldX.setText(String.valueOf(y));
 
         root.add(fieldZ, 116, 25);
         fieldZ.setSize(44, 15);
         fieldZ.setTextPredicate(coordsPredicate);
-        fieldX.setText(String.valueOf(z));
+
+
+        long address = nbtCompound.getLong(EnvelopeItem.ADDRESS_KEY);
+        fieldX.setText(String.valueOf(BlockPos.unpackLongX(address)));
+        fieldY.setText(String.valueOf(BlockPos.unpackLongY(address)));
+        fieldZ.setText(String.valueOf(BlockPos.unpackLongZ(address)));
 
 
 //        nbtCompound.putLong(EnvelopeItem.ADDRESS_KEY, );
@@ -97,7 +97,7 @@ public class EnvelopeGuiDescription extends SyncedGuiDescription {
                 buf.writeLong(pos);
                 ClientPlayNetworking.send(ADDRESS_PACKET_ID, buf);
 
-            } catch (NumberFormatException ex) { // should ideally not happen :)
+            } catch (NumberFormatException ex) { // should ideally not happen :) but you never know
                 return;
             }
         }

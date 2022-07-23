@@ -3,16 +3,15 @@ package net.thecorgi.pigeonpost.common.block;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Hand;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -22,6 +21,7 @@ import net.thecorgi.pigeonpost.common.registry.ItemRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 import static net.thecorgi.pigeonpost.common.envelope.EnvelopeItem.ADDRESS_KEY;
 import static net.thecorgi.pigeonpost.common.envelope.EnvelopeItem.ITEMS_KEY;
@@ -70,9 +70,15 @@ public class BirdhouseBlock extends BlockWithEntity {
 
                         NbtCompound nbtCompound = stack.getOrCreateNbt();
                         if (nbtCompound.contains("Items") && nbtCompound.contains("Address")) {
-                            if (birdhouse.sendToBirdhouse(pos, BlockPos.fromLong(nbtCompound.getLong(ADDRESS_KEY)), nbtCompound.getList(ITEMS_KEY, 10), world)) {
-                                stack.decrement(stack.getCount());
-                                return ActionResult.SUCCESS;
+
+                            Optional<Entity> pigeonx = EntityType.getEntityFromNbt(birdhouse.getPigeonData(), world);
+                            if (pigeonx.isPresent() && pigeonx.get() instanceof PigeonEntity pigeon && pigeon.isOwner(player)){
+                                if (birdhouse.sendToBirdhouse(pos, BlockPos.fromLong(nbtCompound.getLong(ADDRESS_KEY)), nbtCompound.getList(ITEMS_KEY, 10), world)) {
+                                    stack.decrement(stack.getCount());
+                                    return ActionResult.SUCCESS;
+                                } else {
+                                    player.sendMessage(new TranslatableText("block.pigeonpost.birdhouse.full").formatted(Formatting.RED), true);
+                                }
                             }
                         }
                     } else if (!player.isSneaking()) {
@@ -88,10 +94,12 @@ public class BirdhouseBlock extends BlockWithEntity {
                         }
                     }
                 }
+            } else {
+                player.sendMessage(new TranslatableText("block.pigeonpost.birdhouse.invalid").formatted(Formatting.RED), true);
             }
         }
 
-        return ActionResult.FAIL;
+        return ActionResult.SUCCESS;
     }
 
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {

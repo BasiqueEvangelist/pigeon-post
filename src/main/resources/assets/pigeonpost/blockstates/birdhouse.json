@@ -1,8 +1,8 @@
 {
   "variants": {
-    "facing=north": { "model": "pigeon:block/birdhouse", "y": 180, "uvlock": true },
-    "facing=east":  { "model": "pigeon:block/birdhouse", "y":  270, "uvlock": true },
-    "facing=south": { "model": "pigeon:block/birdhouse", "uvlock": true },
-    "facing=west":  { "model": "pigeon:block/birdhouse", "y": 90, "uvlock": true }
+    "facing=north": { "model": "pigeonpost:block/birdhouse", "y": 180, "uvlock": true },
+    "facing=east":  { "model": "pigeonpost:block/birdhouse", "y":  270, "uvlock": true },
+    "facing=south": { "model": "pigeonpost:block/birdhouse", "uvlock": true },
+    "facing=west":  { "model": "pigeonpost:block/birdhouse", "y": 90, "uvlock": true }
   }
 }

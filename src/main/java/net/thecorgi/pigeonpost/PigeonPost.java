@@ -46,7 +46,7 @@ public class PigeonPost implements ModInitializer {
         BlockRegistry.init();
         EntityRegistry.init();
 
-        BiomeModifications.addSpawn(BiomeSelectors.categories(Biome.Category.PLAINS, Biome.Category.BEACH, Biome.Category.FOREST, Biome.Category.MOUNTAIN), SpawnGroup.CREATURE,
+        BiomeModifications.addSpawn(BiomeSelectors.categories(Biome.Category.PLAINS, Biome.Category.FOREST, Biome.Category.MOUNTAIN), SpawnGroup.CREATURE,
                 EntityRegistry.PIGEON, 1, 2, 7);
 
         SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(EnvelopeItem.ID, (syncId, inventory) -> new EnvelopeGuiDescription(syncId, inventory, ENVELOPE.getDefaultStack()));
