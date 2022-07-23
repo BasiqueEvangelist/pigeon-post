@@ -15,7 +15,9 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 import net.thecorgi.pigeonpost.common.envelope.EnvelopeGuiDescription;
 import net.thecorgi.pigeonpost.common.envelope.EnvelopeItem;
@@ -40,6 +42,8 @@ public class PigeonPost implements ModInitializer {
 
     public static ScreenHandlerType<EnvelopeGuiDescription> SCREEN_HANDLER_TYPE;
 
+    public static SoundEvent ENTITY_PIGEON_IDLE = new SoundEvent(id("entity.pigeon.idle"));
+
     @Override
     public void onInitialize() {
         ItemRegistry.init();
@@ -51,21 +55,19 @@ public class PigeonPost implements ModInitializer {
 
         SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(EnvelopeItem.ID, (syncId, inventory) -> new EnvelopeGuiDescription(syncId, inventory, ENVELOPE.getDefaultStack()));
 
-        ServerPlayNetworking.registerGlobalReceiver(ADDRESS_PACKET_ID, new ServerPlayNetworking.PlayChannelHandler() {
-            @Override
-            public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler,
-                                PacketByteBuf buf, PacketSender responseSender) {
+        Registry.register(Registry.SOUND_EVENT, id("entity.pigeon.idle"), ENTITY_PIGEON_IDLE);
 
-                if (player.getWorld().isClient()) return;
+        ServerPlayNetworking.registerGlobalReceiver(ADDRESS_PACKET_ID, (server, player, handler, buf, responseSender) -> {
 
-                long pos = buf.readLong();
-                ItemStack stack = player.getStackInHand(player.getActiveHand());
+            if (player.getWorld().isClient()) return;
 
-                if (stack.isOf(ENVELOPE)) {
-                    NbtCompound nbtCompound = stack.getOrCreateNbt();
-                    nbtCompound.putLong(EnvelopeItem.ADDRESS_KEY, pos);
-                    stack.setNbt(nbtCompound);
-                }
+            long pos = buf.readLong();
+            ItemStack stack = player.getStackInHand(player.getActiveHand());
+
+            if (stack.isOf(ENVELOPE)) {
+                NbtCompound nbtCompound = stack.getOrCreateNbt();
+                nbtCompound.putLong(EnvelopeItem.ADDRESS_KEY, pos);
+                stack.setNbt(nbtCompound);
             }
         });
 

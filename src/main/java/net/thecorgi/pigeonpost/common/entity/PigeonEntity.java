@@ -1,6 +1,7 @@
 package net.thecorgi.pigeonpost.common.entity;
 
 import com.google.common.collect.Sets;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.control.FlightMoveControl;
@@ -21,6 +22,7 @@ import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -30,6 +32,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.thecorgi.pigeonpost.PigeonPost;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
@@ -47,8 +50,6 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
     private final AnimationFactory factory = new AnimationFactory(this);
     private static final Set<Item> TAMING_INGREDIENTS;
     private boolean songPlaying;
-    private NbtCompound envelope;
-    private boolean hasLocation;
     @Nullable
     private BlockPos songSource;
 
@@ -60,7 +61,6 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
     public PigeonEntity(EntityType<? extends TameableHeadEntity> entityType, World world) {
         super(entityType, world);
         this.moveControl = new FlightMoveControl(this, 10, false);
-        this.hasLocation = false;
         this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, -1.0F);
     }
 
@@ -77,7 +77,7 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
         this.goalSelector.add(1, new EscapeDangerGoal(this, 1.25D));
         this.goalSelector.add(2, new LookAtEntityGoal(this, PlayerEntity.class, 4.0F));
         this.goalSelector.add(3, new SitGoal(this));
-        this.goalSelector.add(4, new ConditionalFollowOwner(this, 1.0D, 8.0F, 14.0F, true));
+        this.goalSelector.add(4, new FollowOwnerGoal(this, 1.0D, 8.0F, 14.0F, true));
         this.goalSelector.add(5, new FlyGoal(this, 1.0D));
     }
 
@@ -109,7 +109,6 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
     @Nullable
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
         this.setVariant(random.nextInt(1, 6));
-        this.setEnvelope(new NbtCompound());
         if (entityData == null) {
             entityData = new PassiveData(false);
         }
@@ -124,13 +123,11 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putInt("Variant", this.getVariant());
-        nbt.put("Envelope", this.getEnvelope());
     }
 
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.setVariant(nbt.getInt("Variant"));
-        this.setEnvelope(nbt.getCompound("Envelope"));
     }
 
     public int getVariant() {
@@ -141,24 +138,24 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
         this.dataTracker.set(VARIANT, variant);
     }
 
-    public NbtCompound getEnvelope() {
-        return this.envelope;
-    }
-
-    public void setEnvelope(NbtCompound nbtCompound) {
-        this.envelope = nbtCompound;
-    }
-
-    public boolean hasLocation() {
-        return this.hasLocation;
-    }
-
-    public void setHasLocation(boolean bl) {
-        this.hasLocation = bl;
-    }
-
     public boolean handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
         return false;
+    }
+
+    protected SoundEvent getAmbientSound() {
+        return PigeonPost.ENTITY_PIGEON_IDLE;
+    }
+
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return PigeonPost.ENTITY_PIGEON_IDLE;
+    }
+
+    protected SoundEvent getDeathSound() {
+        return PigeonPost.ENTITY_PIGEON_IDLE;
+    }
+
+    protected void playStepSound(BlockPos pos, BlockState state) {
+        this.playSound(SoundEvents.ENTITY_PARROT_STEP, 0.15F, 1.0F);
     }
 
     public void tickMovement() {
@@ -201,7 +198,7 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
                 }
 
                 if (!this.isSilent()) {
-                    this.world.playSound((PlayerEntity) null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
+                    this.world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
                 }
 
                 if (!this.world.isClient) {
@@ -258,27 +255,8 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
         }
     }
 
-
-
     public double getHeightOffset() {
         return 0.5D;
-    }
-
-    public class ConditionalFollowOwner extends FollowOwnerGoal {
-        private final PigeonEntity pigeon;
-
-        public ConditionalFollowOwner(PigeonEntity pigeon, double speed, float minDistance, float maxDistance, boolean leavesAllowed) {
-            super(pigeon, speed, minDistance, maxDistance, leavesAllowed);
-            this.pigeon = pigeon;
-            this.setControls(EnumSet.of(Control.MOVE, Control.LOOK));
-        }
-
-        public boolean canStart() {
-            if (this.pigeon.hasLocation()) {
-                return false;
-            }
-            return super.canStart();
-        }
     }
 }
 

@@ -1,0 +1,9 @@
+{
+  "entity.pigeon.idle": {
+    "subtitle": "subtitles.pigeonpost.hoot",
+    "sounds": [
+      "pigeonpost:pigeon_idle_1",
+      "pigeonpost:pigeon_idle_2"
+    ]
+  }
+}
