@@ -10,7 +10,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.thecorgi.pigeonpost.PigeonPost;
 
@@ -45,13 +45,13 @@ public class EnvelopeGuiDescription extends SyncedGuiDescription {
 
         NbtCompound nbtCompound = envelope.getOrCreateNbt();
 
-        WLabel xLabel = new WLabel(new LiteralText("X"));
+        WLabel xLabel = new WLabel(Text.literal("X"));
         root.add(xLabel, 27, 16);
 
-        WLabel yLabel = new WLabel(new LiteralText("Y"));
+        WLabel yLabel = new WLabel(Text.literal("Y"));
         root.add(yLabel, 81, 16);
 
-        WLabel zLabel = new WLabel(new LiteralText("Z"));
+        WLabel zLabel = new WLabel(Text.literal("Z"));
         root.add(zLabel, 135, 16);
 
         root.add(fieldX, 8, 25);

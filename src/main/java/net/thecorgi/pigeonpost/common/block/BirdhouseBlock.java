@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -77,7 +77,7 @@ public class BirdhouseBlock extends BlockWithEntity {
                                     stack.decrement(stack.getCount());
                                     return ActionResult.SUCCESS;
                                 } else {
-                                    player.sendMessage(new TranslatableText("block.pigeonpost.birdhouse.full").formatted(Formatting.RED), true);
+                                    player.sendMessage(Text.translatable("block.pigeonpost.birdhouse.full").formatted(Formatting.RED), true);
                                 }
                             }
                         }
@@ -95,7 +95,7 @@ public class BirdhouseBlock extends BlockWithEntity {
                     }
                 }
             } else {
-                player.sendMessage(new TranslatableText("block.pigeonpost.birdhouse.invalid").formatted(Formatting.RED), true);
+                player.sendMessage(Text.translatable("block.pigeonpost.birdhouse.invalid").formatted(Formatting.RED), true);
             }
         }
 

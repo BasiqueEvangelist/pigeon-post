@@ -14,7 +14,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -141,7 +140,7 @@ public class EnvelopeItem extends Item implements NamedScreenHandlerFactory {
             stack.setNbt(nbtCompound);
         }
 
-        NamedScreenHandlerFactory factory = new SimpleNamedScreenHandlerFactory((syncId, inventory, user) -> new EnvelopeGuiDescription(syncId, inventory, stack), new TranslatableText("item.pigeonpost.envelope.gui"));
+        NamedScreenHandlerFactory factory = new SimpleNamedScreenHandlerFactory((syncId, inventory, user) -> new EnvelopeGuiDescription(syncId, inventory, stack), Text.translatable("item.pigeonpost.envelope.gui"));
         player.openHandledScreen(factory);
 
         return TypedActionResult.success(player.getStackInHand(hand));
@@ -162,15 +161,15 @@ public class EnvelopeItem extends Item implements NamedScreenHandlerFactory {
             int y = BlockPos.unpackLongY(pos);
             int z = BlockPos.unpackLongZ(pos);
 
-            tooltip.add(new TranslatableText("item.pigeonpost.envelope.address.valid", Integer.toString(x), Integer.toString(y), Integer.toString(z)).formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable("item.pigeonpost.envelope.address.valid", Integer.toString(x), Integer.toString(y), Integer.toString(z)).formatted(Formatting.GRAY));
         } else {
-            tooltip.add(new TranslatableText("item.pigeonpost.envelope.address.empty").formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable("item.pigeonpost.envelope.address.empty").formatted(Formatting.GRAY));
         }
     }
 
     @Override
     public Text getDisplayName() {
-        return new TranslatableText("item.pigeonpost.envelope.gui");
+        return Text.translatable("item.pigeonpost.envelope.gui");
     }
 
     @Nullable

@@ -7,12 +7,12 @@ import software.bernie.geckolib3.model.AnimatedGeoModel;
 
 public class BirdhouseBlockModel extends AnimatedGeoModel<BirdhouseBlockEntity> {
     @Override
-    public Identifier getModelLocation(BirdhouseBlockEntity object) {
+    public Identifier getModelResource(BirdhouseBlockEntity object) {
         return PigeonPost.id("geo/birdhouse.geo.json");
     }
 
     @Override
-    public Identifier getTextureLocation(BirdhouseBlockEntity object) {
+    public Identifier getTextureResource(BirdhouseBlockEntity object) {
         if (object.hasPigeon()) {
             return PigeonPost.id("textures/block/birdhouse_full.png");
         } else {
@@ -21,7 +21,7 @@ public class BirdhouseBlockModel extends AnimatedGeoModel<BirdhouseBlockEntity> 
     }
 
     @Override
-    public Identifier getAnimationFileLocation(BirdhouseBlockEntity object) {
+    public Identifier getAnimationResource(BirdhouseBlockEntity object) {
         return PigeonPost.id("animations/birdhouse.animation.json");
     }
 }

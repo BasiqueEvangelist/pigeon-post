@@ -108,7 +108,7 @@ public class PigeonEntity extends TameableHeadEntity implements IAnimatable, Flu
 
     @Nullable
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData entityData, @Nullable NbtCompound entityNbt) {
-        this.setVariant(random.nextInt(1, 6));
+        this.setVariant(random.nextBetween(1, 6));
         if (entityData == null) {
             entityData = new PassiveData(false);
         }
